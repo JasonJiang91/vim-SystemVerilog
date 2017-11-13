@@ -243,10 +243,11 @@ function GetSystemVerilogIndent()
       if vverb | echo vverb_str "Fail Indent after a function/task/class block statement.\n" | endif
     endif
 
-  " Indent after multiple-line function/task stand-alone ');'
-  elseif last_line =~ '^\s*)\s*;\s*$'
+  " Indent after multiple-line function/task/interface/class stand-alone ');'
+  " or ') .* ;'
+  elseif last_line =~ '^\s*).*\s*;\s*$'
     let m_lnum  = s:GetSVBlockStart(')', lnum, 'line')
-    if s:RemoveSVComment(getline(m_lnum)) =~ '\%(\%(\<\S\+\s\+\)*\<\%(function\|task\)\>\)' &&
+    if s:RemoveSVComment(getline(m_lnum)) =~ '\%(\%(\<\S\+\s\+\)*\<\%(function\|task\|interface\|class\)\>\)' &&
      \ s:RemoveSVComment(getline(m_lnum)) !~ '^\s*\<\%(extern\|import\)\>'
       let ind = ind + offset
       if vverb
@@ -369,16 +370,16 @@ function GetSystemVerilogIndent()
     endif
  
   " De-indent on a stand-alone '{'
-  elseif curr_line =~ '^\s*[{]' &&
-       \ last_line !~ '[{]'
-    call cursor(v:lnum,1)
-    let m_lnum = search('^\s*\%(\<\%(if\|else\|foreach' .
-       \ '\)\>\|' .
-       \ '\%(`\<uvm_do\)\)' , 'bnW')
-    let ind = m_lnum>0 && m_lnum<v:lnum ? indent(m_lnum) : indent(lnum)
-    if vverb
-      echo vverb_str "De-indent a stand alone { statement.\n" 'l:' lnum ',m:' m_lnum
-    endif
+"  elseif curr_line =~ '^\s*[{]' &&
+"       \ last_line !~ '[{]'
+"    call cursor(v:lnum,1)
+"    let m_lnum = search('^\s*\%(\<\%(if\|else\|foreach' .
+"       \ '\)\>\|' .
+"       \ '\%(`\<uvm_do\)\)' , 'bnW')
+"    let ind = m_lnum>0 && m_lnum<v:lnum ? indent(m_lnum) : indent(lnum)
+"    if vverb
+"      echo vverb_str "De-indent a stand alone { statement.\n" 'l:' lnum ',m:' m_lnum
+"    endif
 
   " ? TODO
   elseif curr_line =~ '^\s*`\<if\%[n]def\>'
